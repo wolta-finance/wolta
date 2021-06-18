@@ -7,19 +7,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-import "../../../utils/UniswapHelpers.sol";
+import "../../../utils/UniswapV2Helpers.sol";
 
 import "../../../interfaces/IStrategy.sol";
+import "../../../interfaces/IVault.sol";
 import "../../../interfaces/sushiswap/IMiniChefV2.sol";
 import "../../../interfaces/uniswap/IUniswapV2Pair.sol";
 import "../../../interfaces/uniswap/IUniswapV2Router02.sol";
 
-contract SushiDoubleFarm is UniswapHelpers, Pausable, IStrategy {
+contract PolygonSushiDoubleFarm is UniswapV2Helpers, Pausable, IStrategy {
     using SafeERC20 for IERC20;
-
-    // --------------- Fields ---------------
-
-    address public governance;
 
     address public override vault;
     address public override underlying;
@@ -29,9 +26,6 @@ contract SushiDoubleFarm is UniswapHelpers, Pausable, IStrategy {
     address public token1;
     address public rewardToken0;
     address public rewardToken1;
-    mapping(address => mapping(address => address[])) swapRoutes;
-
-    // --------------- Constants ---------------
 
     address public constant miniChefV2 =
         address(0x0769fd68dFb93167989C6f7254cd0D766Fb2841F);
@@ -39,52 +33,45 @@ contract SushiDoubleFarm is UniswapHelpers, Pausable, IStrategy {
     address public constant sushiSwapRouter =
         address(0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506);
 
-    // --------------- Events ---------------
-
-    // --------------- Modifiers ---------------
-
     modifier onlyGovernance {
-        require(msg.sender == governance, "Not governance");
+        require(
+            msg.sender == vault || msg.sender == governance(),
+            "Not governance"
+        );
         _;
     }
 
     modifier onlyVaultOrGovernance {
         require(
-            msg.sender == vault || msg.sender == governance,
+            msg.sender == vault || msg.sender == governance(),
             "Not vault or governance"
         );
         _;
     }
 
-    // --------------- Constructor ---------------
-
     constructor(
-        address governance_,
         address vault_,
-        address underlying_,
         uint256 pid_,
         address token0_,
         address token1_,
         address rewardToken0_,
         address rewardToken1_
-    ) UniswapHelpers(sushiSwapRouter) {
+    ) UniswapV2Helpers(sushiSwapRouter) {
+        vault = vault_;
+        underlying = IVault(vault).underlying();
+
         require(
-            IMiniChefV2(miniChefV2).lpToken(pid) == underlying_,
+            IMiniChefV2(miniChefV2).lpToken(pid) == underlying,
             "Pool id does not match underlying"
         );
         require(
-            IUniswapV2Pair(underlying_).token0() == token0_,
-            "Token 0 does not match underlying LP token"
+            IUniswapV2Pair(underlying).token0() == token0_,
+            "Token 0 does not match underlying"
         );
         require(
-            IUniswapV2Pair(underlying_).token1() == token1_,
-            "Token 1 does not match underlying LP token"
+            IUniswapV2Pair(underlying).token1() == token1_,
+            "Token 1 does not match underlying"
         );
-
-        governance = governance_;
-
-        vault = vault_;
-        underlying = underlying_;
 
         pid = pid_;
         token0 = token0_;
@@ -93,7 +80,9 @@ contract SushiDoubleFarm is UniswapHelpers, Pausable, IStrategy {
         rewardToken1 = rewardToken1_;
     }
 
-    // --------------- Views ---------------
+    function governance() public view override returns (address) {
+        return IVault(vault).governance();
+    }
 
     function underlyingBalanceInStrategy()
         public
@@ -116,8 +105,6 @@ contract SushiDoubleFarm is UniswapHelpers, Pausable, IStrategy {
     function totalUnderlyingBalance() public view override returns (uint256) {
         return underlyingBalanceInStrategy() + underlyingBalanceInRewardPool();
     }
-
-    // --------------- Actions ---------------
 
     function withdraw(uint256 amount) public override onlyVaultOrGovernance {
         if (amount > underlyingBalanceInStrategy()) {
@@ -152,8 +139,6 @@ contract SushiDoubleFarm is UniswapHelpers, Pausable, IStrategy {
     function resume() public onlyGovernance {
         _unpause();
     }
-
-    // --------------- Internal ---------------
 
     function _enterRewardPool() internal {
         uint256 amountToInvest = underlyingBalanceInStrategy();
@@ -205,7 +190,7 @@ contract SushiDoubleFarm is UniswapHelpers, Pausable, IStrategy {
             _swap(toToken1, rewardToken1, swapRoutes[rewardToken1][token1]);
         }
 
-        _provideLiquidity(
+        _addLiquidity(
             token0,
             token1,
             IERC20(token0).balanceOf(address(this)),

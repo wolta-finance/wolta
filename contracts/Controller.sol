@@ -2,26 +2,19 @@
 
 pragma solidity 0.8.4;
 
+import "./interfaces/IController.sol";
 import "./interfaces/IVault.sol";
 
-contract Controller {
-    // --------------- Fields ---------------
-
-    address public governance;
+contract Controller is IController {
+    address public override governance;
 
     mapping(address => bool) public vaults;
     mapping(address => bool) public hardWorkers;
 
-    // --------------- Events ---------------
-
     event HardWorkerAdded(address hardWorker);
     event HardWorkerRemoved(address hardWorker);
-
     event VaultAdded(address vault);
-
     event HardWorked(address vault, address strategy, uint256 newSharePrice);
-
-    // --------------- Modifiers ---------------
 
     modifier onlyGovernance {
         require(msg.sender == governance, "Not governance");
@@ -59,13 +52,13 @@ contract Controller {
         _;
     }
 
-    // --------------- Constructor ---------------
-
     constructor(address governance_) {
         governance = governance_;
     }
 
-    // --------------- Actions ---------------
+    function transferGovernship(address governance_) public onlyGovernance {
+        governance = governance_;
+    }
 
     function addHardWorker(address hardWorker) public onlyGovernance {
         require(!hardWorkers[hardWorker], "Hard worker already exists");

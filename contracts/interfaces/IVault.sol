@@ -3,7 +3,7 @@
 pragma solidity 0.8.4;
 
 interface IVault {
-    // --------------- Views ---------------
+    function governance() external view returns (address);
 
     function controller() external view returns (address);
 
@@ -22,8 +22,6 @@ interface IVault {
     function totalUnderlyingBalance() external view returns (uint256);
 
     function availableToInvest() external view returns (uint256);
-
-    // --------------- Actions ---------------
 
     function setStrategy(address strategy_) external;
 

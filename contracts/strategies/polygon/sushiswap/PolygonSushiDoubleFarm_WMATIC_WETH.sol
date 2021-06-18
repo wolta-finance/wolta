@@ -2,14 +2,17 @@
 
 pragma solidity 0.8.4;
 
-import "./SushiDoubleFarm.sol";
+import "../../../Vault.sol";
+import "./PolygonSushiDoubleFarm.sol";
 
-contract SushiDoubleFarm_WMATIC_WETH is SushiDoubleFarm {
-    // --------------- Constants ---------------
-
+contract PolygonSushiDoubleFarm_WMATIC_WETH_Vault is Vault {
     address public constant wmaticWethSlp =
         address(0xc4e595acDD7d12feC385E5dA5D43160e8A0bAC0E);
 
+    constructor(address controller_) Vault(controller_, wmaticWethSlp, 1e18) {}
+}
+
+contract PolygonSushiDoubleFarm_WMATIC_WETH is PolygonSushiDoubleFarm {
     address public constant wmatic =
         address(0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270);
     address public constant weth =
@@ -17,13 +20,9 @@ contract SushiDoubleFarm_WMATIC_WETH is SushiDoubleFarm {
     address public constant sushi =
         address(0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a);
 
-    // --------------- Constructor ---------------
-
-    constructor(address governance_, address vault_)
-        SushiDoubleFarm(
-            governance_,
+    constructor(address vault_)
+        PolygonSushiDoubleFarm(
             vault_,
-            wmaticWethSlp, // underlying
             0, // reward pool id
             wmatic, // lp token 0
             weth, // lp token 1

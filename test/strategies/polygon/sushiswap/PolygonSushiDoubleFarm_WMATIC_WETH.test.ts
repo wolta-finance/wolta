@@ -3,10 +3,10 @@ import { expect } from "chai";
 import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 
-import { setupBasicProtocol } from "@/protocol/index";
+import { setupProtocolWithStrategy } from "@/protocol/index";
 import { advanceHours, getArtifact, impersonate } from "@/utils/index";
 
-const STRATEGY = "SushiDoubleFarm_WMATIC_WETH";
+const STRATEGY = "PolygonSushiDoubleFarm_WMATIC_WETH";
 
 // Use block 15482261
 describe(STRATEGY, () => {
@@ -44,10 +44,8 @@ describe(STRATEGY, () => {
       .transfer(farmer.address, await underlying.balanceOf(whale.address));
 
     // Setup protocol
-    const contracts = await setupBasicProtocol(deployer, {
+    const contracts = await setupProtocolWithStrategy(deployer, {
       governance,
-      underlying,
-      investmentPercentage: ethers.utils.parseEther("1"),
       strategyName: STRATEGY,
     });
 

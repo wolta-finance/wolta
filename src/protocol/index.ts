@@ -9,34 +9,27 @@ type ControllerDeploymentParams = {
 
 export const deployController = async (
   deployer: SignerWithAddress,
-  params: ControllerDeploymentParams
+  { governance }: ControllerDeploymentParams
 ): Promise<Contract> =>
   deployContract({
     name: "Controller",
     from: deployer,
-    args: [params.governance.address],
+    args: [governance.address],
   });
 
 type VaultDeploymentParams = {
-  governance: SignerWithAddress;
-  controller: Contract;
-  underlying: Contract;
-  investmentPercentage: BigNumberish;
+  name: string;
+  args: (string | BigNumberish)[];
 };
 
 export const deployVault = async (
   deployer: SignerWithAddress,
-  params: VaultDeploymentParams
+  { name, args }: VaultDeploymentParams
 ): Promise<Contract> =>
   deployContract({
-    name: "Vault",
+    name,
     from: deployer,
-    args: [
-      params.governance.address,
-      params.controller.address,
-      params.underlying.address,
-      params.investmentPercentage,
-    ],
+    args,
   });
 
 type StrategyDeploymentParams = {
@@ -46,18 +39,16 @@ type StrategyDeploymentParams = {
 
 export const deployStrategy = async (
   deployer: SignerWithAddress,
-  params: StrategyDeploymentParams
+  { name, args }: StrategyDeploymentParams
 ): Promise<Contract> =>
   deployContract({
-    name: params.name,
+    name,
     from: deployer,
-    args: params.args,
+    args,
   });
 
 type BasicProtocolDeploymentParams = {
   governance: SignerWithAddress;
-  underlying: Contract;
-  investmentPercentage: BigNumberish;
   strategyName: string;
   strategyArgs?: (string | BigNumberish)[];
 };
@@ -68,30 +59,28 @@ type BasicProtocol = {
   strategy: Contract;
 };
 
-export const setupBasicProtocol = async (
+export const setupProtocolWithStrategy = async (
   deployer: SignerWithAddress,
-  params: BasicProtocolDeploymentParams
+  { governance, strategyName, strategyArgs }: BasicProtocolDeploymentParams
 ): Promise<BasicProtocol> => {
   const controller = await deployController(deployer, {
-    governance: params.governance,
+    governance,
   });
 
   const vault = await deployVault(deployer, {
-    governance: params.governance,
-    controller,
-    underlying: params.underlying,
-    investmentPercentage: params.investmentPercentage,
+    name: `${strategyName}_Vault`,
+    args: [controller.address],
   });
 
-  const defaultStrategyArgs = [params.governance.address, vault.address];
+  const defaultStrategyArgs = [vault.address];
   const strategy = await deployStrategy(deployer, {
-    name: params.strategyName,
-    args: params.strategyArgs || defaultStrategyArgs,
+    name: strategyName,
+    args: strategyArgs || defaultStrategyArgs,
   });
 
   // Connect the vault and strategy via the controller
   await controller
-    .connect(params.governance)
+    .connect(governance)
     .addVaultAndStrategy(vault.address, strategy.address);
 
   return {

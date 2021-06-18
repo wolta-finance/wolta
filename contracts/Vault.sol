@@ -8,15 +8,12 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 
 import "./utils/ERC20WithDecimals.sol";
 
+import "./interfaces/IController.sol";
 import "./interfaces/IStrategy.sol";
 import "./interfaces/IVault.sol";
 
 contract Vault is ERC20WithDecimals, IVault {
     using SafeERC20 for IERC20;
-
-    // --------------- Fields ---------------
-
-    address public governance;
 
     address public override controller;
     address public override strategy;
@@ -25,16 +22,14 @@ contract Vault is ERC20WithDecimals, IVault {
 
     uint256 private _underlyingUnit;
 
-    // --------------- Modifiers ---------------
-
     modifier onlyGovernance {
-        require(msg.sender == governance, "Not governance");
+        require(msg.sender == governance(), "Not governance");
         _;
     }
 
     modifier onlyControllerOrGovernance {
         require(
-            msg.sender == controller || msg.sender == governance,
+            msg.sender == controller || msg.sender == governance(),
             "Not controller or governance"
         );
         _;
@@ -45,10 +40,7 @@ contract Vault is ERC20WithDecimals, IVault {
         _;
     }
 
-    // --------------- Constructor ---------------
-
     constructor(
-        address governance_,
         address controller_,
         address underlying_,
         uint256 investmentPercentage_
@@ -61,8 +53,6 @@ contract Vault is ERC20WithDecimals, IVault {
     {
         require(investmentPercentage_ <= 1e18, "Invalid investment percentage");
 
-        governance = governance_;
-
         controller = controller_;
         underlying = underlying_;
         investmentPercentage = investmentPercentage_;
@@ -70,7 +60,9 @@ contract Vault is ERC20WithDecimals, IVault {
         _underlyingUnit = 10**uint256(ERC20(underlying_).decimals());
     }
 
-    // --------------- Views ---------------
+    function governance() public view override returns (address) {
+        return IController(controller).governance();
+    }
 
     function pricePerShare() public view override returns (uint256) {
         if (totalSupply() == 0) {
@@ -113,8 +105,6 @@ contract Vault is ERC20WithDecimals, IVault {
                 underlyingBalanceInVault()
             );
     }
-
-    // --------------- Actions ---------------
 
     function setStrategy(address strategy_)
         public
@@ -202,8 +192,6 @@ contract Vault is ERC20WithDecimals, IVault {
         _invest();
         IStrategy(strategy).doHardWork();
     }
-
-    // --------------- Internal ---------------
 
     function _invest() internal {
         uint256 amountToInvest = availableToInvest();

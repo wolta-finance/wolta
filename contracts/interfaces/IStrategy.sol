@@ -3,7 +3,7 @@
 pragma solidity 0.8.4;
 
 interface IStrategy {
-    // --------------- Views ---------------
+    function governance() external view returns (address);
 
     function vault() external view returns (address);
 
@@ -14,8 +14,6 @@ interface IStrategy {
     function underlyingBalanceInRewardPool() external view returns (uint256);
 
     function totalUnderlyingBalance() external view returns (uint256);
-
-    // --------------- Actions ---------------
 
     function withdraw(uint256 amount) external;
 
