@@ -149,13 +149,13 @@ contract UniswapV2Zap is UniswapV2Helpers {
 
         _swap(
             IERC20(token0).balanceOf(address(this)),
-            tokenOut,
+            token0,
             swapRoutes[token0][tokenOut]
         );
 
         _swap(
             IERC20(token1).balanceOf(address(this)),
-            tokenOut,
+            token1,
             swapRoutes[token1][tokenOut]
         );
 

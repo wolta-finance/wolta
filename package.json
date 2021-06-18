@@ -1,5 +1,5 @@
 {
-  "name": "tbd-finance",
+  "name": "wolta-finance",
   "version": "0.0.1",
   "description": "Yield farming on Polygon",
   "scripts": {
@@ -8,8 +8,7 @@
     "test": "hardhat test"
   },
   "keywords": [
-    "yield",
-    "farming",
+    "yield farming",
     "polygon"
   ],
   "license": "MIT",
