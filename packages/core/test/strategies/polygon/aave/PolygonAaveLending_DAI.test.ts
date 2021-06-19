@@ -3,14 +3,9 @@ import { expect } from "chai";
 import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 
-import { lpt, r, t } from "@/config/polygon.json";
+import { t } from "@/config/polygon.json";
 import { setupProtocolWithStrategy } from "@/test/index";
-import {
-  advanceHours,
-  formatBalance,
-  formatValue,
-  impersonate,
-} from "@/utils/index";
+import { advanceHours, formatValue, impersonate } from "@/utils/index";
 
 const STRATEGY = "PolygonAaveLending_DAI";
 
