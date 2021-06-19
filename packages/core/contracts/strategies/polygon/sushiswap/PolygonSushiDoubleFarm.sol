@@ -12,8 +12,6 @@ import "../../../utils/UniswapV2Helpers.sol";
 import "../../../interfaces/IStrategy.sol";
 import "../../../interfaces/IVault.sol";
 import "../../../interfaces/sushiswap/IMiniChefV2.sol";
-import "../../../interfaces/uniswap/IUniswapV2Pair.sol";
-import "../../../interfaces/uniswap/IUniswapV2Router02.sol";
 
 contract PolygonSushiDoubleFarm is UniswapV2Helpers, Pausable, IStrategy {
     using SafeERC20 for IERC20;
@@ -173,7 +171,7 @@ contract PolygonSushiDoubleFarm is UniswapV2Helpers, Pausable, IStrategy {
 
     function _liquidateReward() internal {
         uint256 reward0 = IERC20(rewardToken0).balanceOf(address(this));
-        if (reward0 > 0) {
+        {
             uint256 toToken0 = reward0 / 2;
             _swap(toToken0, rewardToken0, swapRoutes[rewardToken0][token0]);
 
@@ -182,7 +180,7 @@ contract PolygonSushiDoubleFarm is UniswapV2Helpers, Pausable, IStrategy {
         }
 
         uint256 reward1 = IERC20(rewardToken1).balanceOf(address(this));
-        if (reward1 > 0) {
+        {
             uint256 toToken0 = reward1 / 2;
             _swap(toToken0, rewardToken1, swapRoutes[rewardToken1][token0]);
 

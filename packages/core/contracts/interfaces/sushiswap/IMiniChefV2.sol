@@ -3,16 +3,12 @@
 pragma solidity 0.8.4;
 
 interface IMiniChefV2 {
-    // --------------- Views ---------------
-
     function lpToken(uint256 pid) external view returns (address);
 
     function userInfo(uint256 pid, address user)
         external
         view
         returns (uint256, int256);
-
-    // --------------- Actions ---------------
 
     function deposit(
         uint256 pid,
