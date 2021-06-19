@@ -3,18 +3,14 @@ import { expect } from "chai";
 import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 
-import { lpTokens, routers, tokens } from "@/config/polygon.json";
-import { setupProtocolWithStrategy } from "@/test/index";
+import { lpt, r, t } from "@/config/polygon.json";
+import { setupProtocolWithStrategy, setupUniswapV2Zap } from "@/test/index";
 import {
   advanceHours,
-  deployContract,
-  getArtifact,
+  formatBalance,
+  formatValue,
   impersonate,
 } from "@/utils/index";
-
-const { sushiswap } = routers;
-const { dai, weth, wmatic } = tokens;
-const { sushiWmaticWeth } = lpTokens;
 
 const STRATEGY = "PolygonSushiDoubleFarm_WMATIC_WETH";
 
@@ -23,6 +19,7 @@ describe(STRATEGY, function () {
   this.timeout(600000);
 
   let underlying: Contract;
+  let usdc: Contract;
 
   let controller: Contract;
   let vault: Contract;
@@ -36,115 +33,90 @@ describe(STRATEGY, function () {
   let zapper: SignerWithAddress;
 
   before(async () => {
-    const IERC20 = await getArtifact("IERC20");
+    // Set up token contracts
+    underlying = await ethers.getContractAt("ERC20", lpt.sushiWmaticWeth);
+    usdc = await ethers.getContractAt("ERC20", t.usdc);
 
-    // Setup underlying
-    underlying = new Contract(sushiWmaticWeth, IERC20.abi, ethers.provider);
-
-    // Setup signers
+    // Set up signers
     [deployer, governance, farmer, zapper] = await ethers.getSigners();
 
-    // Impersonate whale account
+    // Impersonate underlying whale account
     const underlyingWhaleAddress = "0x0160afFF7a7A824429A8202995D03239d2D418fa";
     await impersonate(underlyingWhaleAddress);
     const underlyingWhale = await ethers.getSigner(underlyingWhaleAddress);
 
-    // Transfer from whale to farmer
+    // Transfer underlying from whale to farmer
     await underlying
       .connect(underlyingWhale)
       .transfer(
         farmer.address,
-        await underlying.balanceOf(underlyingWhale.address)
+        await underlying.balanceOf(underlyingWhaleAddress)
       );
 
-    // Setup protocol
-    const contracts = await setupProtocolWithStrategy(deployer, {
+    // Set up protocol
+    const protocolContracts = await setupProtocolWithStrategy(deployer, {
       governance,
       strategyName: STRATEGY,
     });
 
-    controller = contracts.controller;
-    vault = contracts.vault;
-    strategy = contracts.strategy;
+    controller = protocolContracts.controller;
+    vault = protocolContracts.vault;
+    strategy = protocolContracts.strategy;
 
-    // zap = await deployContract({
-    //   from: deployer,
-    //   name: "UniswapV2Zap",
-    //   args: [governance.address, sushiswap],
-    // });
+    // Impersonate USDC whale account
+    const usdcWhaleAddress = "0x86fE8d6D4C8A007353617587988552B6921514Cb";
+    await impersonate(usdcWhaleAddress);
+    const usdcWhale = await ethers.getSigner(usdcWhaleAddress);
 
-    // await zap.connect(governance).addSwapRoute(dai, weth, [dai, weth]);
-    // await zap
-    //   .connect(governance)
-    //   .addSwapRoute(dai, wmatic, [dai, weth, wmatic]);
-    // await zap.connect(governance).addSwapRoute(weth, dai, [weth, dai]);
-    // await zap
-    //   .connect(governance)
-    //   .addSwapRoute(wmatic, dai, [wmatic, weth, dai]);
+    // Transfer USDC from whale to zapper
+    await usdc
+      .connect(usdcWhale)
+      .transfer(zapper.address, await usdc.balanceOf(usdcWhaleAddress));
 
-    // // Impersonate whale account
-    // const daiWhaleAddress = "0x493BEb822506d75eD7C6484b219A2E5979EE377c";
-    // await impersonate(daiWhaleAddress);
-    // const daiWhale = await ethers.getSigner(daiWhaleAddress);
-
-    // // Transfer from whale to zapper
-    // const daiContract = new Contract(dai, IERC20.abi, ethers.provider);
-    // await daiContract
-    //   .connect(daiWhale)
-    //   .transfer(zapper.address, await daiContract.balanceOf(daiWhale.address));
+    // Set up zap
+    zap = await setupUniswapV2Zap(deployer, {
+      governance,
+      router: r.sushiswap,
+      swapRoutes: [
+        [t.usdc, t.weth],
+        [t.usdc, t.weth, t.wmatic],
+        [t.weth, t.usdc],
+        [t.wmatic, t.weth, t.usdc],
+      ],
+    });
   });
 
-  // it("zap in", async () => {
-  //   const IERC20 = await getArtifact("IERC20");
-  //   const daiContract = new Contract(dai, IERC20.abi, ethers.provider);
+  it("zap", async () => {
+    const zapInBalance = await usdc.balanceOf(zapper.address);
 
-  //   console.log(
-  //     "Dai before before",
-  //     await daiContract.balanceOf(zapper.address).then((n: any) => n.toString())
-  //   );
+    console.log("Before zap in");
+    console.log(`Balance: ${await formatBalance(usdc, zapper.address)}`);
+    console.log(`Shares: ${await formatBalance(vault, zapper.address)}`);
 
-  //   await daiContract
-  //     .connect(zapper)
-  //     .approve(zap.address, await daiContract.balanceOf(zapper.address));
-  //   await zap
-  //     .connect(zapper)
-  //     .zapIn(
-  //       vault.address,
-  //       dai,
-  //       await daiContract.balanceOf(zapper.address),
-  //       1
-  //     );
+    await usdc.connect(zapper).approve(zap.address, zapInBalance);
+    await zap.connect(zapper).zapIn(vault.address, t.usdc, zapInBalance, 1);
 
-  //   console.log(
-  //     "Dai before",
-  //     await daiContract.balanceOf(zapper.address).then((n: any) => n.toString())
-  //   );
-  //   console.log(
-  //     "Shares before",
-  //     await vault.balanceOf(zapper.address).then((n: any) => n.toString())
-  //   );
+    console.log("After zap in");
+    console.log(`Balance: ${await formatBalance(usdc, zapper.address)}`);
+    console.log(`Shares: ${await formatBalance(vault, zapper.address)}`);
 
-  //   await vault
-  //     .connect(zapper)
-  //     .approve(zap.address, await vault.balanceOf(zapper.address));
-  //   await zap
-  //     .connect(zapper)
-  //     .zapOutAndSwap(
-  //       vault.address,
-  //       await vault.balanceOf(zapper.address),
-  //       dai,
-  //       1
-  //     );
+    expect((await usdc.balanceOf(zapper.address)).eq(0)).to.be.true;
+    expect((await vault.balanceOf(zapper.address)).eq(0)).to.be.false;
 
-  //   console.log(
-  //     "Dai after",
-  //     await daiContract.balanceOf(zapper.address).then((n: any) => n.toString())
-  //   );
-  //   console.log(
-  //     "Shares after",
-  //     await vault.balanceOf(zapper.address).then((n: any) => n.toString())
-  //   );
-  // });
+    const zapOutBalance = await vault.balanceOf(zapper.address);
+
+    await vault.connect(zapper).approve(zap.address, zapOutBalance);
+    await zap
+      .connect(zapper)
+      .zapOutAndSwap(vault.address, zapOutBalance, t.usdc, 1);
+
+    console.log("After zap out");
+    console.log(`Balance: ${await formatBalance(usdc, zapper.address)}`);
+    console.log(`Shares: ${await formatBalance(vault, zapper.address)}`);
+
+    expect((await usdc.balanceOf(zapper.address)).eq(0)).to.be.false;
+    expect((await vault.balanceOf(zapper.address)).eq(0)).to.be.true;
+  });
 
   it("farmer earns money", async () => {
     const initialFarmerBalance: BigNumber = await underlying.balanceOf(
@@ -166,10 +138,10 @@ describe(STRATEGY, function () {
       newSharePrice = await vault.pricePerShare();
 
       console.log(
-        `Old share price: ${ethers.utils.formatEther(oldSharePrice)}`
+        `Old share price: ${await formatValue(vault, oldSharePrice)}`
       );
       console.log(
-        `New share price: ${ethers.utils.formatEther(newSharePrice)}`
+        `New share price: ${await formatValue(vault, newSharePrice)}`
       );
 
       await advanceHours(12);
@@ -184,7 +156,10 @@ describe(STRATEGY, function () {
     expect(initialFarmerBalance.lt(currentFarmerBalance)).to.be.true;
 
     console.log(
-      `Earned ${currentFarmerBalance.sub(initialFarmerBalance).toString()}`
+      `Earned ${await formatValue(
+        underlying,
+        currentFarmerBalance.sub(initialFarmerBalance)
+      )}`
     );
   });
-}).timeout(600000);
+});

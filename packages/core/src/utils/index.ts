@@ -1,6 +1,5 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
-import { Contract } from "ethers";
-import glob from "glob";
+import { BigNumberish, Contract } from "ethers";
 import { ethers } from "hardhat";
 
 export const currentTimestamp = async (): Promise<number> => {
@@ -22,17 +21,15 @@ export const advanceBlocks = async (numBlocks: number) => {
 export const impersonate = async (...addresses: string[]) =>
   ethers.provider.send("hardhat_impersonateAccount", addresses);
 
-export const getArtifact = async (contract: string): Promise<any> =>
-  new Promise((resolve, reject) => {
-    glob(`**/${contract}.json`, (error, [firstMatch]) => {
-      if (error) {
-        return reject(error);
-      } else {
-        // Make sure to update the relative path when moving this file
-        return resolve(require(`../../${firstMatch}`));
-      }
-    });
-  });
+export const formatValue = async (
+  token: Contract,
+  value: BigNumberish
+): Promise<string> => ethers.utils.formatUnits(value, await token.decimals());
+
+export const formatBalance = async (
+  token: Contract,
+  account: string
+): Promise<string> => formatValue(token, await token.balanceOf(account));
 
 type ContractDeploymentParams = {
   name: string;

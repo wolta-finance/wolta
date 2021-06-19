@@ -89,3 +89,28 @@ export const setupProtocolWithStrategy = async (
     strategy,
   };
 };
+
+type BasicZapDeploymentParams = {
+  governance: SignerWithAddress;
+  router: string;
+  swapRoutes: string[][];
+};
+
+export const setupUniswapV2Zap = async (
+  deployer: SignerWithAddress,
+  { governance, router, swapRoutes }: BasicZapDeploymentParams
+): Promise<Contract> => {
+  const zap = await deployContract({
+    from: deployer,
+    name: "UniswapV2Zap",
+    args: [governance.address, router],
+  });
+
+  for (const route of swapRoutes) {
+    await zap
+      .connect(governance)
+      .addSwapRoute(route[0], route[route.length - 1], route);
+  }
+
+  return zap;
+};
