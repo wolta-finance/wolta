@@ -1,6 +1,5 @@
 import { ChainId, DAppProvider, useEthers, useEtherBalance } from '@usedapp/core'
 import { formatEther } from '@ethersproject/units'
-import styles from '../styles/Home.module.css'
 const config = {
   readOnlyChainId: ChainId.Mainnet,
   readOnlyUrls: {
@@ -12,7 +11,7 @@ const Dapp = () => {
 const { activateBrowserWallet, account, deactivate } = useEthers()
   const etherBalance = useEtherBalance(account)
   return (
-    <div className={styles.card}>
+    <div className="bg-yellow-200">
       <div>
         {account 
             ? <button onClick={() => deactivate()}>Disconnect</button>
