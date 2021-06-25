@@ -58,6 +58,7 @@ describe(STRATEGY, function () {
     const initialFarmerBalance: BigNumber = await underlying.balanceOf(
       farmer.address
     );
+
     await underlying
       .connect(farmer)
       .approve(vault.address, initialFarmerBalance);
