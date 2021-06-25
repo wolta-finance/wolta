@@ -1,8 +1,10 @@
 import { Fragment } from 'react';
 import Head from 'next/head'
-import Image from 'next/image'
-import { encode } from "universal-base64";
-import Svg from '../components/svg-patterns';
+import LogoArea from '../components/logo-area';
+import MainPaperWindow from '../components/main-paper-window';
+import Footer from '../components/footer';
+import TokenDropdown from '../components/token-dropdown';
+import Columns from '../components/columns';
 
 export default function Home() {
   return (
@@ -13,51 +15,45 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <main className=" max-w-screen-lg mx-auto relative pr-16 pb-16 mt-10">
-      <div className="absolute inset-0 left-5 top-5 right-10 bottom-10  border border-black bg-white z-20"></div>
-      <div className="absolute inset-0 left-10 top-10 right-5 bottom-5  border border-black bg-white z-10"></div>
-      <div className="absolute inset-0 left-16 top-16 right-0 bottom-0 bg-black z-0" style={{
-        backgroundImage: `url("data:image/svg+xml;base64,${encode(
-          Svg({ color: '#FFFFFF', density: 4 })
-        )}")`,
-      }}></div>
-      <div className="relative border border-black bg-white p-5 z-50">
-        <div className="flex justify-center flex-col items-center">
-          <h1 className="heading text-3xl">
-            The Farming Daily
-          </h1>
-          <div className="sub-heading mb-2 lg:mb-0">Presents</div>
-        </div>
-        <div className="flex justify-center border-b border-black -ml-5 -mr-5">
-          <h2 className="logo tracking-wider text-5xl md:text-7xl lg:text-8xl lg:leading-tight pb-4">
-          Wolta Finance
-          </h2>
-        </div>
-        <div className="p-5 -ml-5 -mr-5 hover:bg-purple-500">
-          <a href="https://nextjs.org/docs" >
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-        </div>
-        <div className="p-5 -ml-5 -mr-5 hover:bg-purple-500">
-          <h2>Documentation &rarr;</h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </div>
-      </div>
-      </main>
+      <MainPaperWindow>
+        <LogoArea />
+        <Columns className="-ml-5 -mr-5 border-b border-black">
+          <Columns.Col>
+            <div className="p-5 hover:bg-purple-500">
+              <a href="https://nextjs.org/docs" >
+                <h2>Documentation &rarr;</h2>
+                <p>Find in-depth information about Next.js features and API.</p>
+              </a>
+            </div>
+          </Columns.Col>
+          <Columns.Col>
+            <div className="p-5 hover:bg-purple-500">
+              <h2>Documentation &rarr;</h2>
+              <p>Find in-depth information about Next.js features and API.</p>
+            </div>
+          </Columns.Col>
+        </Columns>
+        <Columns className="-ml-5 -mr-5 border-b border-black">
+          <Columns.Col>
+          <TokenDropdown />
+          <p>Some instruction</p>
+          </Columns.Col>
 
-      <footer className="mx-4">
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+          <Columns.Col>
+          <TokenDropdown />
+          <p>Some instruction</p>
+          </Columns.Col>
+          <Columns.Col>
+          <TokenDropdown />
+          <p>Some instruction</p>
+          </Columns.Col>
+        </Columns>
+        <div className="-ml-5 -mr-5 p-5">
+          <p>Some expanding content can go here</p>
+        </div>
+      </MainPaperWindow>
+
+      <Footer />
     </Fragment>
   )
 }
