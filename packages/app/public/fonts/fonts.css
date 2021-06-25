@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'brightonsregular';
+    src: url('brightons-zvgxl-webfont.woff2') format('woff2'),
+         url('brightons-zvgxl-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  
+  }
+  
+  @font-face {
+    font-family: 'wastinger_display_free_persRg';
+    src: url('wastingerdisplayfreepersonal-mvydr-webfont.woff2') format('woff2'),
+         url('wastingerdisplayfreepersonal-mvydr-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  
+  }
+  
+  @font-face {
+    font-family: 'chomskyregular';
+    src: url('chomsky-8moa2-webfont.woff2') format('woff2'),
+         url('chomsky-8moa2-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  
+  }

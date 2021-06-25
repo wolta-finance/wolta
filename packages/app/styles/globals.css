@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import "../public/fonts/fonts.css";
+
+body {
+  background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxkZWZzPgogICAgICA8cGF0dGVybiBpZD0iUGF0dGVybiIgeD0iMCIgeT0iMCIgd2lkdGg9IjAuMSIgaGVpZ2h0PSIwLjEiPgogICAgICAgIDxjaXJjbGUgY3g9IjEwIiBjeT0iMS4xMjUiIHI9IjAuNzUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC41Ii8+CiAgICAgICAgPGNpcmNsZSBjeD0iMS4xMjUiIGN5PSIxMCIgcj0iMC43NSIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjUiLz4KICAgIAogICAgICA8L3BhdHRlcm4+CiAgICA8L2RlZnM+CiAgICAKICAgIDxyZWN0IGZpbGw9InVybCgjUGF0dGVybikiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIi8+CiAgICA8L3N2Zz4=");
+}
+
+.heading {
+  font-family: "chomskyregular";
+}
+
+.sub-heading {
+  font-family: "wastinger_display_free_persRg";
+}
+
+.logo {
+  font-family: 'brightonsregular';
+  background-color: black;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxkZWZzPgogICAgICA8cGF0dGVybiBpZD0iUGF0dGVybiIgeD0iMCIgeT0iMCIgd2lkdGg9IjAuMDQiIGhlaWdodD0iMC4wNCI+CiAgICAgICAgPGNpcmNsZSBjeD0iNSIgY3k9IjEuMTI1IiByPSIwLjc1IiBmaWxsPSIjRkZGRkZGIiBmaWxsLW9wYWNpdHk9IjEiLz4KICAgICAgICA8Y2lyY2xlIGN4PSIxLjEyNSIgY3k9IjUiIHI9IjAuNzUiIGZpbGw9IiNGRkZGRkYiIGZpbGwtb3BhY2l0eT0iMSIvPgogICAgCiAgICAgIDwvcGF0dGVybj4KICAgIDwvZGVmcz4KICAgIAogICAgPHJlY3QgZmlsbD0idXJsKCNQYXR0ZXJuKSIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiLz4KICAgIDwvc3ZnPg==");
+}
