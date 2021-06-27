@@ -8,15 +8,6 @@
   }
   
   @font-face {
-    font-family: 'wastinger_display_free_persRg';
-    src: url('wastingerdisplayfreepersonal-mvydr-webfont.woff2') format('woff2'),
-         url('wastingerdisplayfreepersonal-mvydr-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-  
-  }
-  
-  @font-face {
     font-family: 'chomskyregular';
     src: url('chomsky-8moa2-webfont.woff2') format('woff2'),
          url('chomsky-8moa2-webfont.woff') format('woff');
@@ -24,3 +15,28 @@
     font-style: normal;
   
   }
+
+  @font-face {
+    font-family: 'steadyregular';
+    src: url('steady-regular-webfont.woff2') format('woff2'),
+        url('steady-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+    @font-face {
+        font-family: 'metropolis1920regular';
+        src: url('metropolis1920-regular-webfont.woff2') format('woff2'),
+                url('metropolis1920-regular-webfont.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'phosphateinline';
+        src: url('phosphate-inline-01-webfont.woff2') format('woff2'),
+             url('phosphate-inline-01-webfont.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    
+    }

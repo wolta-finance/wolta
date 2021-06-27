@@ -6,6 +6,7 @@
 
 body {
   background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxkZWZzPgogICAgICA8cGF0dGVybiBpZD0iUGF0dGVybiIgeD0iMCIgeT0iMCIgd2lkdGg9IjAuMSIgaGVpZ2h0PSIwLjEiPgogICAgICAgIDxjaXJjbGUgY3g9IjEwIiBjeT0iMS4xMjUiIHI9IjAuNzUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC41Ii8+CiAgICAgICAgPGNpcmNsZSBjeD0iMS4xMjUiIGN5PSIxMCIgcj0iMC43NSIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjUiLz4KICAgIAogICAgICA8L3BhdHRlcm4+CiAgICA8L2RlZnM+CiAgICAKICAgIDxyZWN0IGZpbGw9InVybCgjUGF0dGVybikiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIi8+CiAgICA8L3N2Zz4=");
+  font-family:Georgia, 'Times New Roman', Times, serif;
 }
 
 .heading {
@@ -13,11 +14,11 @@ body {
 }
 
 .sub-heading {
-  font-family: "wastinger_display_free_persRg";
+  font-family: "brightonsregular";
 }
 
 .logo {
-  font-family: 'brightonsregular';
+  font-family: 'phosphateinline';
   background-color: black;
   background-clip: text;
   -webkit-text-fill-color: transparent;

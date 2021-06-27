@@ -5,10 +5,10 @@ const LogoArea = () => (
             <h1 className="heading text-3xl">
             The Farming Daily
             </h1>
-            <div className="sub-heading mb-2 lg:mb-0">Presents</div>
+            <div className="sub-heading text-2xl">Presents</div>
         </div>
         <div className="flex justify-center border-b border-black -ml-5 -mr-5">
-            <h2 className="logo tracking-wider text-5xl md:text-7xl lg:text-8xl lg:leading-tight pb-4">
+            <h2 className="logo tracking-wider text-5xl md:text-7xl lg:text-8xl lg:leading-tight pb-5">
             Wolta Finance
             </h2>
         </div>
