@@ -5,6 +5,7 @@ import MainPaperWindow from '../components/main-paper-window';
 import Footer from '../components/footer';
 import TokenDropdown from '../components/token-dropdown';
 import Columns from '../components/columns';
+import VaultsTable from '../components/vaults-table';
 
 export default function Home() {
   return (
@@ -17,6 +18,9 @@ export default function Home() {
       
       <MainPaperWindow>
         <LogoArea />
+        <div className="-ml-5 -mr-5 p-5 border-b border-black">
+          <VaultsTable />
+        </div>
         <Columns className="-ml-5 -mr-5 border-b border-black">
           <Columns.Col>
             <div className="p-5 hover:bg-purple-500">
