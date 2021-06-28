@@ -91,12 +91,12 @@ contract PolygonAaveLeveragedBorrowing is
         ) = IAaveProtocolDataProvider(dataProvider).getReserveConfigurationData(
             underlying
         );
-        borrowRateMax = ltv.mul(99).div(100); // 1% of ltv
+        borrowRateMax = (ltv * 99) / 100; // 1% of ltv
         // At minimum, borrow rate always 10% lower than liquidation threshold
-        if (threshold.mul(9).div(10) > borrowRateMax) {
-            borrowRate = borrowRateMax.div(100); // 7500 -> 75
+        if ((threshold * 9) / 10 > borrowRateMax) {
+            borrowRate = borrowRateMax / 100; // 7500 -> 75
         } else {
-            borrowRate = threshold.mul(9).div(10).div(100);
+            borrowRate = (threshold * 9) / 10 / 100;
         }
 
         // Only leverage if you can
@@ -143,7 +143,7 @@ contract PolygonAaveLeveragedBorrowing is
         if (amount > underlyingBalanceInStrategy()) {
             if (
                 (currentHealthFactor() <= MIN_HEALTH_FACTOR) ||
-                amount.mul(2) >= underlyingBalanceInStrategy()
+                amount * 2 >= underlyingBalanceInStrategy()
             ) {
                 // check if the health factor doesn't allow for partialDeleverage or if there are too many loops in partialDeleverage
                 _fullDeleverage();
@@ -200,7 +200,7 @@ contract PolygonAaveLeveragedBorrowing is
         (uint256 supplyBal, ) = supplyAndDebt();
 
         // Only withdraw the 10% of the max withdraw
-        uint256 toWithdraw = _maxWithdrawFromSupply(supplyBal).mul(100).div(10);
+        uint256 toWithdraw = (_maxWithdrawFromSupply(supplyBal) * 100) / 10;
 
         ILendingPool(lendingPool).withdraw(
             underlying,
@@ -239,7 +239,7 @@ contract PolygonAaveLeveragedBorrowing is
             );
             if (amountToInvest > minLeverage) {
                 for (uint256 i = 0; i < borrowDepth; i++) {
-                    amountToInvest = amountToInvest.mul(borrowRate).div(100);
+                    amountToInvest = (amountToInvest * borrowRate) / 100;
                     ILendingPool(lendingPool).borrow(
                         underlying,
                         amountToInvest,
@@ -277,11 +277,9 @@ contract PolygonAaveLeveragedBorrowing is
         // to do the math we should remove 12 places from healthFactor to get a HF
         // with only 6 "decimals" and add 6 "decimals" to supply to divide like we do IRL.
         return
-            _supply.sub(
-                _supply.mul(1e6).div(
-                    currentHealthFactor().div(1e12).sub(0.10e6)
-                )
-            );
+            _supply -
+            (_supply * 1e6) /
+            ((currentHealthFactor() / 1e12) - 0.10e6);
     }
 
     function _partialDeleverage(uint256 amount_) internal {
@@ -304,7 +302,7 @@ contract PolygonAaveLeveragedBorrowing is
 
             if (debtBal > 0) {
                 // Only repay the just amount
-                toRepay = toWithdraw.mul(borrowRate).div(100);
+                toRepay = (toWithdraw * borrowRate) / 100;
                 ILendingPool(lendingPool).repay(
                     underlying,
                     toRepay,
@@ -353,7 +351,7 @@ contract PolygonAaveLeveragedBorrowing is
         uint256 amountToAllow = underlyingBalanceInStrategy();
         uint256 amountToAdd = amountToAllow;
         for (uint256 i = 0; i < borrowRate; i++) {
-            amountToAdd = amountToAdd.mul(borrowRate).div(100);
+            amountToAdd = (amountToAdd * borrowRate) / 100;
             amountToAllow += amountToAdd;
         }
         IERC20(underlying).safeApprove(lendingPool, 0);
