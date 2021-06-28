@@ -18,8 +18,8 @@ import "../../../interfaces/curve/ICurveFi_5tokens.sol";
 contract PolygonCurveAtricrypto is UniswapV2Helpers, Pausable, IStrategy {
     using SafeERC20 for IERC20;
 
-    address vault;
-    address underlying;
+    address public override vault;
+    address public override underlying;
 
     address rewardToken;
 
@@ -41,17 +41,18 @@ contract PolygonCurveAtricrypto is UniswapV2Helpers, Pausable, IStrategy {
     }
 
     modifier onlyVaultOrGovernance() {
-        requre(
-            msg.sender == vault() || msg.sender == governance(),
+        require(
+            msg.sender == vault || msg.sender == governance(),
             "Not vault or governance"
         );
+        _;
     }
 
     constructor(address vault_) UniswapV2Helpers(sushiSwapRouter) {
         vault = vault_;
         underlying = IVault(vault).underlying();
 
-        rewardToken = ICurveLiquidityRewardGauge(gauge).rewarded_token();
+        rewardToken = ICurveLiquidityRewardGauge(curveGauge).rewarded_token();
     }
 
     function governance() public view override returns (address) {
@@ -113,7 +114,7 @@ contract PolygonCurveAtricrypto is UniswapV2Helpers, Pausable, IStrategy {
         uint256 amountToInvest = underlyingBalanceInStrategy();
         if (amountToInvest > 0) {
             IERC20(underlying).safeApprove(curveGauge, 0);
-            IERC20(underlying).safeApprove(curveGauge, entireBalance);
+            IERC20(underlying).safeApprove(curveGauge, amountToInvest);
 
             ICurveGauge(curveGauge).deposit(amountToInvest);
         }
