@@ -6,5 +6,6 @@
 
 Monorepo for Wolta, structured as follows:
 
-- [`packages/app`](./packages/app): web client
-- [`packages/core`](./packages/core): core smart contracts
+- [`app`](./packages/app): web client
+- [`core/farming`](./packages/core): core smart contracts for yield farming
+- [`core/stream`](./packages/stream): core smart contracts for streaming investments
