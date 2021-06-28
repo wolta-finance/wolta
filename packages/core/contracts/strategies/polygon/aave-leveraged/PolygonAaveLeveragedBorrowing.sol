@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.4;
-import "hardhat/console.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 import "../../../interfaces/IStrategy.sol";
@@ -23,7 +21,6 @@ contract PolygonAaveLeveragedBorrowing is
     UniswapV2Helpers
 {
     using SafeERC20 for IERC20;
-    using SafeMath for uint256;
 
     address public override vault;
     address public override underlying;
@@ -144,8 +141,11 @@ contract PolygonAaveLeveragedBorrowing is
 
     function withdraw(uint256 amount) public override onlyVaultOrGovernance {
         if (amount > underlyingBalanceInStrategy()) {
-            if ((currentHealthFactor() <= MIN_HEALTH_FACTOR)) {
-                // check if the health factor doesn't allow for partialDeleverage or if ther are too many loopings in partialDeleverage
+            if (
+                (currentHealthFactor() <= MIN_HEALTH_FACTOR) ||
+                amount.mul(2) >= underlyingBalanceInStrategy()
+            ) {
+                // check if the health factor doesn't allow for partialDeleverage or if there are too many loops in partialDeleverage
                 _fullDeleverage();
             } else {
                 _partialDeleverage(amount);
@@ -180,9 +180,15 @@ contract PolygonAaveLeveragedBorrowing is
         external
         onlyVaultOrGovernance
     {
-        require(borrowRate_ <= borrowRateMax, "!rate");
-        require(borrowRate_ != 0, "borrowRate is used as a divisor");
-        require(borrowDepth_ <= BORROW_DEPTH_MAX, "!depth");
+        require(
+            borrowRate_ <= borrowRateMax,
+            "borrowRate is bigger than the allowed borrowRateMax "
+        );
+        require(borrowRate_ != 0, "borrowRate cannot be 0");
+        require(
+            borrowDepth_ <= BORROW_DEPTH_MAX,
+            "borrowDepth is bigger than the allowed BORROW_DEPTH_MAX"
+        );
 
         _fullDeleverage();
         borrowRate = borrowRate_;
@@ -194,7 +200,7 @@ contract PolygonAaveLeveragedBorrowing is
         (uint256 supplyBal, ) = supplyAndDebt();
 
         // Only withdraw the 10% of the max withdraw
-        uint256 toWithdraw = maxWithdrawFromSupply(supplyBal).mul(100).div(10);
+        uint256 toWithdraw = _maxWithdrawFromSupply(supplyBal).mul(100).div(10);
 
         ILendingPool(lendingPool).withdraw(
             underlying,
@@ -262,7 +268,7 @@ contract PolygonAaveLeveragedBorrowing is
     }
 
     // Divide the supply with HF less 0.5 to finish at least with HF~=1.05
-    function maxWithdrawFromSupply(uint256 _supply)
+    function _maxWithdrawFromSupply(uint256 _supply)
         internal
         view
         returns (uint256)
@@ -284,27 +290,21 @@ contract PolygonAaveLeveragedBorrowing is
         uint256 toWithdraw;
         uint256 toRepay;
 
-        console.log("JK, I'm gonna be here");
-
         IERC20(underlying).safeApprove(lendingPool, 0);
         IERC20(underlying).safeApprove(lendingPool, type(uint256).max);
 
         while (underlyingBalanceInStrategy() < amount_) {
             (supplyBal, debtBal) = supplyAndDebt();
-            toWithdraw = maxWithdrawFromSupply(supplyBal);
+            toWithdraw = _maxWithdrawFromSupply(supplyBal);
             ILendingPool(lendingPool).withdraw(
                 underlying,
                 toWithdraw,
                 address(this)
             );
 
-            console.log("Looping here");
-            console.log("Debt balance is %s", debtBal / 1e18);
-
             if (debtBal > 0) {
                 // Only repay the just amount
                 toRepay = toWithdraw.mul(borrowRate).div(100);
-                console.log("To repay is %s", toRepay / 1e18);
                 ILendingPool(lendingPool).repay(
                     underlying,
                     toRepay,
@@ -318,12 +318,11 @@ contract PolygonAaveLeveragedBorrowing is
 
     function _fullDeleverage() internal {
         (uint256 supplyBal, uint256 debtBal) = supplyAndDebt();
-        console.log("I'm gonna be here");
         uint256 toWithdraw;
         IERC20(underlying).safeApprove(lendingPool, 0);
         IERC20(underlying).safeApprove(lendingPool, debtBal);
         while (debtBal > 0) {
-            toWithdraw = maxWithdrawFromSupply(supplyBal);
+            toWithdraw = _maxWithdrawFromSupply(supplyBal);
 
             ILendingPool(lendingPool).withdraw(
                 underlying,
