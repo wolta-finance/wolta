@@ -4,7 +4,7 @@ import { encode } from "universal-base64";
 import { formatEther } from '@ethersproject/units'
 
 const Button = (props: any) => (
-    <button className="p-2 border-4 border-white font-bold uppercase" onClick={props.onClick}>
+    <button className="p-2 border-2 border-white font-bold uppercase" onClick={props.onClick}>
         {props.children}
     </button>
 )
@@ -18,7 +18,7 @@ const DappWalet = () => {
             Svg({ color: 'white', density: 1, opacity: 0.5 })
           )}")`,
         }}>
-          {account && <div style={{margin: '4px'}} className="p-2 border-purple-700 font-bold">
+          {account && <div style={{margin: '2px'}} className="p-2 border-purple-700 font-bold">
               <span className="bg-purple-700">{shortenAddress(account)}</span>
             </div>}
           <div>
