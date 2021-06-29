@@ -1,6 +1,7 @@
+import DappWalet from "./dappwallet";
 import { Fragment } from "react";
 const LogoArea = () => (
-    <Fragment>
+    <section className="relative">
         <div className="flex justify-center flex-col items-center">
             <h1 className="heading text-3xl">
             The Farming Daily
@@ -12,7 +13,10 @@ const LogoArea = () => (
             Wolta Finance
             </h2>
         </div>
-    </Fragment>
+        <div className="absolute top-0 right-0">
+            <DappWalet />
+        </div>
+    </section>
 );
 
 export default LogoArea;
