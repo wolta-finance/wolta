@@ -6,6 +6,7 @@ import Footer from '../components/footer';
 import TokenDropdown from '../components/token-dropdown';
 import Columns from '../components/columns';
 import VaultsTable from '../components/vaults-table';
+import CurrentPositionCards from '../components/current-position-cards';
 
 export default function Home() {
   return (
@@ -18,6 +19,9 @@ export default function Home() {
       
       <MainPaperWindow>
         <LogoArea />
+        <div className="-ml-5 -mr-5 px-5 pt-5">
+          <CurrentPositionCards />
+        </div>
         <div className="-ml-5 -mr-5 p-5 border-b border-black">
           <VaultsTable />
         </div>
