@@ -3,10 +3,13 @@ import Image from 'next/image';
 import Svg from './svg-patterns';
 import { encode } from "universal-base64";
 import Chart from './chart';
+import EntryForm from './entry-form';
+import { useModals } from './modalprovider';
 import EthTokenList from '../assets/blockchains/ethereum/tokenlist.json';
 const tokenSymbols = ['USDC', 'COMP'];
 const vaults = EthTokenList.tokens.filter(each => tokenSymbols.includes(each.symbol));
 const Card = (props: any) => {
+  const { pushModal } = useModals();
   return (
   <div className="border border-black p-px mr-3 max-w-4xl" style={{minWidth: '15rem'}}>
   <div className="border border-black">
@@ -24,6 +27,8 @@ const Card = (props: any) => {
             }}></div>
         </div>
         <div className="flex items-center px-2">{props.vault.symbol}</div>
+        <button className="p-1 ml-auto border-2 border-black uppercase text-sm font-bold" onClick={()=>pushModal(<EntryForm />, {overlay: true})}><span className="bg-white">Manage</span></button>
+        
     </div>
     <div className="p-2">
       <div className="flex justify-between">
