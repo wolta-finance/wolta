@@ -3,12 +3,8 @@ import { Dialog, Transition } from '@headlessui/react';
 
 const Modal = (props) => {
 
-    let initialFocus;
-    if (props.initialFocus) {
-        initialFocus = props.initialFocus
-    } else {
-        initialFocus = useRef();
-    }
+    const newRef = useRef();
+    const initialFocus = props.initialFocus ? props.initialFocus : newRef;
     
     return(
     <Dialog
