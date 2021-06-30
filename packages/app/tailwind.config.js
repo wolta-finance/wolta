@@ -23,5 +23,7 @@ module.exports = {
       borderWidth: ['last'],
     }
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }
