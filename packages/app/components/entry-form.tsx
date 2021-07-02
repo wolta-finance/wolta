@@ -27,7 +27,7 @@ const EntryForm = () => {
             </label>
             <label className="block">
             <span className="text-gray-700">Additional details</span>
-            <textarea className="mt-1 block w-full" rows="3"></textarea>
+            <textarea className="mt-1 block w-full" rows={3}></textarea>
             </label>
             <div className="block">
             <div className="mt-2">

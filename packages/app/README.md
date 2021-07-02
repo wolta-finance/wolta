@@ -1,6 +1,7 @@
 ## Wolta App
+Copy `.env.local.example` to `.env.local` and add a public Polygon PRC url
 
-First, run the command to copy blockchain assets and then run the development server:
+Then run the command to copy blockchain assets and then run the development server:
 
 ```bash
 npm run assets

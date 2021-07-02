@@ -1,7 +1,7 @@
 import { Fragment, useRef, createContext, useContext, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
-const Modal = (props) => {
+const Modal = (props: any) => {
 
     const newRef = useRef();
     const initialFocus = props.initialFocus ? props.initialFocus : newRef;
@@ -29,10 +29,17 @@ const Modal = (props) => {
     </Dialog>
 )}
 
-const ModalContext = createContext();
+const ModalContext = createContext(null);
+
+type ContextType = {
+    stack: {}[], 
+    pushModal: (component: any, modalProps: {}) => void,
+    popModal: () => void,
+    popAllModals: () => void,
+}
 
 export const useModals = () => {
-  const ctx = useContext(ModalContext);
+  const ctx: ContextType = useContext(ModalContext);
 
   if (!ctx) {
     throw Error(
@@ -45,9 +52,9 @@ export const useModals = () => {
 
 const { Provider } = ModalContext;
 
-const ModalProvider = props => {
+const ModalProvider = (props: any) => {
     const [stack, setStack] = useState([]);
-    const contextValue = {
+    const contextValue: ContextType = {
         stack, 
         pushModal: (component, modalProps) => setStack(current=>[...current, { component, modalProps}]),
         popModal: () => setStack(current=>current.slice(0, current.length - 1)),

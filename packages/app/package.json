@@ -7,9 +7,10 @@
     "start": "next start",
     "lint": "next lint",
     "prebuild": "npm run assets",
-    "assets": "run-s assets:clone assets:copy",
+    "assets": "run-s assets:clone assets:copy assets:clean",
     "assets:copy": "cp -r ./assets/blockchains/ethereum ./public/blockchains/ && cp -r ./assets/blockchains/polygon ./public/blockchains/",
-    "assets:clone": "git clone --depth=1 git@github.com:trustwallet/assets.git --branch=master"
+    "assets:clone": "git clone --depth=1 git@github.com:trustwallet/assets.git --branch=master",
+    "assets:clean": "rm -rf ./assets"
   },
   "dependencies": {
     "@ethersproject/units": "^5.3.0",

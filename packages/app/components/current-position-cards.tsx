@@ -5,7 +5,7 @@ import { encode } from "universal-base64";
 import Chart from './chart';
 import EntryForm from './entry-form';
 import { useModals } from './modalprovider';
-import EthTokenList from '../assets/blockchains/ethereum/tokenlist.json';
+import EthTokenList from '../public/blockchains/ethereum/tokenlist.json';
 const tokenSymbols = ['USDC', 'COMP'];
 const vaults = EthTokenList.tokens.filter(each => tokenSymbols.includes(each.symbol));
 const Card = (props: any) => {
