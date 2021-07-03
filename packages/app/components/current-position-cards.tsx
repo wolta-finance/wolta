@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Svg from './svg-patterns';
 import { encode } from "universal-base64";
 import Chart from './chart';
-import EntryForm from './entry-form';
+import ExitForm from './exit-form';
 import { useModals } from './modalprovider';
 import EthTokenList from '../public/blockchains/ethereum/tokenlist.json';
 const tokenSymbols = ['USDC', 'COMP'];
@@ -27,7 +27,7 @@ const Card = (props: any) => {
             }}></div>
         </div>
         <div className="flex items-center px-2">{props.vault.symbol}</div>
-        <button className="p-1 ml-auto border-2 border-black uppercase text-sm font-bold" onClick={()=>pushModal(<EntryForm />, {overlay: true})}><span className="bg-white">Manage</span></button>
+        <button className="p-1 ml-auto border-2 border-black uppercase text-sm font-bold" onClick={()=>pushModal(<ExitForm />, {overlay: true})}><span className="bg-white">Manage</span></button>
         
     </div>
     <div className="p-2">

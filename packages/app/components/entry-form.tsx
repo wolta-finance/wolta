@@ -1,45 +1,94 @@
+import { useState } from 'react';
 import { useModals } from './modalprovider';
-const EntryForm = () => {
-    const { popModal } = useModals(); 
+import TokenSelect from './token-select';
+import InvestmentSelect from './investment-select';
+import Image from 'next/image'
+import EthTokenList from '../public/blockchains/ethereum/tokenlist.json';
+import { vaultSymbols } from '../constants/vaults';
+const vaults = EthTokenList.tokens.filter(each => vaultSymbols.includes(each.symbol));
+
+const mode = {
+    direct: 'DIRECT',
+    zap: 'ZAP',
+}
+
+const investmentType = {
+    traditional: 'Traditional',
+    streaming: 'Streaming',
+}
+
+const EntryForm = ({ vault }) => {
+    const { popModal } = useModals();
+    const [ currentVault, setCurrentVault] = useState(vault);
+    const [currentMode, setCurrentMode] = useState(mode.direct);
+    const [currentInvestmentType, setCurrentInvestmentType] = useState(investmentType.traditional);
+    console.log(currentVault)
     return (
         <div className="m-4">
-            <p>Just an unstyled form. Please replace.</p>
-            <label className="block">
-            <span className="text-gray-700">Full name</span>
-            <input type="text" className="mt-1 block w-full" placeholder="" />
+            <InvestmentSelect onChange={result=>setCurrentInvestmentType(result.name)} />
+            <label className="block mb-4">
+            <span className="text-gray-700">You are depositing into</span>
+                <TokenSelect 
+                value={vaults.findIndex(each=>each.symbol === currentVault.symbol)}
+                onChange={v=>setCurrentVault(vaults[v])}
+                selectOptions={vaults.map(each => `${each.symbol} Vault`)} 
+                currentlySelectedImage={<Image 
+                    src={`/blockchains/ethereum/assets/${currentVault.address}/logo.png`} 
+                    alt="Vercel Logo" 
+                    width={32} 
+                    height={32} 
+                />}/>
             </label>
-            <label className="block">
-            <span className="text-gray-700">Email address</span>
-            <input type="email" className="mt-1 block w-full" placeholder="john@example.com" />
+
+            <label className="block mb-4">
+            <span className="text-gray-700">Using token</span>
+                <TokenSelect 
+                    onChange={(v)=>setCurrentMode(mode[Object.keys(mode)[v]])} 
+                    value={Object.values(mode).findIndex(e=>e===currentMode)} 
+                    selectOptions={['DAI (Wallet balance: 0.1)', 'Convert token via ZAP']} />
             </label>
-            <label className="block">
-            <span className="text-gray-700">When is your event?</span>
-            <input type="date" className="mt-1 block w-full" />
-            </label>
-            <label className="block">
-            <span className="text-gray-700">What type of event is it?</span>
-            <select className="block w-full mt-1">
-                <option>Corporate event</option>
-                <option>Wedding</option>
-                <option>Birthday</option>
-                <option>Other</option>
-            </select>
-            </label>
-            <label className="block">
-            <span className="text-gray-700">Additional details</span>
-            <textarea className="mt-1 block w-full" rows={3}></textarea>
-            </label>
-            <div className="block">
-            <div className="mt-2">
-                <div>
-                <label className="inline-flex items-center">
-                    <input type="checkbox" defaultChecked={true} />
-                    <span className="ml-2">Email me news and special offers</span>
+            
+            {currentMode === mode.zap
+            ? (
+                <label className="block mb-4">
+                <span className="text-gray-700">Token to be converted/zapped</span>
+                    <TokenSelect onChange={(v)=>console.log(v)} selectOptions={['Select token', 'USDC']} />
                 </label>
-                </div>
+            )
+            : (
+                <p className="my-7">
+                    Your token will not be converted, but may be wrapped into an equivalent token. When using a streaming investment, your whole balance will be wrapped.
+                </p>
+            )}
+            {currentInvestmentType === investmentType.traditional
+                ? (
+                    <label className="block mb-4">
+                    <span className="text-gray-700">Amount to invest</span>
+                    <div className="flex">
+                        <input type="number" className="mt-1 block" placeholder="" defaultValue={0} />
+                        <button className="ml-2 underline" onClick={()=>true}>MAX</button>
+                    </div>
+                    </label>
+                )
+                : (
+                    <label className="block mb-4">
+                    <span className="text-gray-700">Flow rate per day</span>
+                    <div className="flex">
+                        <input type="number" className="mt-1 block" placeholder="" defaultValue={0} />
+                        <p className="ml-2 mt-3">Full ballance will be wrapped</p>
+                    </div>
+                    </label>
+                )
+            }
+            
+
+            <div className="flex justify-center space-x-4 mb-4">
+                <button className="p-2 border-2 border-black uppercase text-sm font-bold selector-shading"><span className="bg-white">Approve spend of $TOKEN</span></button>
+                <button disabled="disabled" className="p-2 border-2 border-black uppercase text-sm font-bold"><span className="bg-white">Deposit</span></button>
             </div>
+            <div className="flex justify-center space-x-4 mb-4">
+                <button className="underline" onClick={popModal}>Close</button>
             </div>
-            <button onClick={popModal}>Close</button>
         </div>
     )
 }
