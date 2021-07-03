@@ -3,7 +3,6 @@ import Head from 'next/head'
 import LogoArea from '../components/logo-area';
 import MainPaperWindow from '../components/main-paper-window';
 import Footer from '../components/footer';
-import TokenDropdown from '../components/token-dropdown';
 import Columns from '../components/columns';
 import VaultsTable from '../components/vaults-table';
 import CurrentPositionCards from '../components/current-position-cards';
@@ -41,24 +40,6 @@ export default function Home() {
             </div>
           </Columns.Col>
         </Columns>
-        <Columns className="-ml-5 -mr-5 border-b border-black">
-          <Columns.Col>
-          <TokenDropdown />
-          <p>Some instruction</p>
-          </Columns.Col>
-
-          <Columns.Col>
-          <TokenDropdown />
-          <p>Some instruction</p>
-          </Columns.Col>
-          <Columns.Col>
-          <TokenDropdown />
-          <p>Some instruction</p>
-          </Columns.Col>
-        </Columns>
-        <div className="-ml-5 -mr-5 p-5">
-          <p>Some expanding content can go here</p>
-        </div>
       </MainPaperWindow>
 
       <Footer />

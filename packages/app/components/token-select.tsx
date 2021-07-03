@@ -1,4 +1,4 @@
-const TokenSelect = ({ selectOptions = [], currentlySelectedImage, onChange, value}) => (
+const TokenSelect = ({ selectOptions = [], currentlySelectedImage = null, onChange, value = undefined}) => (
 <div className="relative">
     <div className="absolute pl-2 pt-1">
         {currentlySelectedImage}
