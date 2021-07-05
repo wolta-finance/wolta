@@ -10,5 +10,11 @@
   },
   "lpt": {
     "sushiWmaticWeth": "0xc4e595acdd7d12fec385e5da5d43160e8a0bac0e"
+  },
+  "superfluid": {
+    "host": "0x3E14dC1b13c488a8d5D310918780c983bD5982E7",
+    "cfa": "0x6EeE6060f715257b970700bc2656De21dEdF074C",
+    "sTokenFactory": "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34",
+    "daix": "0x1305F6B6Df9Dc47159D12Eb7aC2804d4A33173c2"
   }
 }

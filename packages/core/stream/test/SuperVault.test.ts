@@ -1,11 +1,18 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { expect } from "chai";
+import { assert, expect } from "chai";
 import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
+import { web3tx, toWad, toBN } from "@decentral.ee/web3-helpers";
+// import { web3 } from "@nomiclabs/hardhat-web3";
 
 import { t } from "@/config/polygon.json";
 import { setupProtocolWithStrategy } from "@/test/index";
 import { advanceHours, formatValue, impersonate } from "@/utils/index";
+
+import { deployFramework } from "@superfluid-finance/ethereum-contracts/scripts/deploy-framework";
+import { deployTestToken } from "@superfluid-finance/ethereum-contracts/scripts/deploy-test-token";
+import { deploySuperToken } from "@superfluid-finance/ethereum-contracts/scripts/deploy-super-token";
+import { SuperfluidSDK } from "@superfluid-finance/js-sdk";
 
 const STRATEGY = "PolygonAaveLeveragedBorrowing_DAI";
 
@@ -23,12 +30,24 @@ describe(STRATEGY, function () {
   let governance: SignerWithAddress;
   let farmer: SignerWithAddress;
 
+  let sf: Contract;
+  let daix: Contract;
+  let app: Contract;
+
   before(async () => {
+    const errorHandler = (err: any) => {
+      if (err) throw err;
+    };
     // Set up token contracts
     underlying = await ethers.getContractAt("ERC20", t.dai);
 
     // Set up signers
     [deployer, governance, farmer] = await ethers.getSigners();
+
+    await deployFramework(errorHandler, {
+      ethers,
+      from: deployer.address,
+    });
 
     // Impersonate underlying whale account
     const underlyingWhaleAddress = "0x1A50a6238eb67285cCD4DF17f75CCe430BAAE2A4";

@@ -11,8 +11,6 @@ import "./interfaces/IController.sol";
 
 import "./Vault.sol";
 import "./SuperAppPipe.sol";
-// import "@openzeppelin/contracts/token/ERC777/IERC777.sol";
-// import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
@@ -39,7 +37,7 @@ contract SuperVault is Vault, SuperAppPipe {
         SuperAppPipe(host_, cfa_, acceptedToken_, yBearingToken_)
         Vault(controller_, underlying_, investmentPercentage_)
     {
-        _underlyingUnit = 10**uint256(ISuperToken(yBearingToken).decimals());
+        _underlyingUnit = 10**uint256(ISuperToken(yBearingToken_).decimals());
         unwrappedAcceptedToken = underlying_;
     }
 

@@ -9,7 +9,7 @@ import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/c
 import {SuperAppBase} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperAppBase.sol";
 
 import {INativeSuperToken, NativeSuperTokenProxy} from "./NativeSuperToken.sol";
-import {SuperVault} from "./SuperVault.sol";
+import {PolygonAaveLeveragedBorrowing_DAI_Vault} from "./strategies/polygon/aave/PolygonAaveLeveragedBorrowing_DAI.sol";
 
 contract MasterStreamer {
     ISuperfluid private host; // host
@@ -19,14 +19,14 @@ contract MasterStreamer {
     ISuperTokenFactory private superTokenFactory;
     address public superVault;
     address public unwrappedAcceptedToken;
+    uint256 constant TOTAL_SUPPLY = 1000000000000000000000000;
 
     constructor(
         ISuperfluid host_,
         IConstantFlowAgreementV1 cfa_,
         ISuperToken acceptedToken_,
         ISuperTokenFactory superTokenFactory_,
-        address controller_,
-        uint256 investmentPercentage_
+        address controller_
     ) {
         host = host_;
         cfa = cfa_;
@@ -37,22 +37,24 @@ contract MasterStreamer {
         sybToken = INativeSuperToken(address(new NativeSuperTokenProxy()));
 
         // get the underlying token
-        unwrappedAcceptedToken = address(
-            ISuperToken(acceptedToken).getUnderlyingToken()
-        );
+        // unwrappedAcceptedToken = address(
+        //     ISuperToken(acceptedToken).getUnderlyingToken()
+        // );
 
         // deploy the superVault using the new sybToken address
         superVault = address(
-            new SuperVault(
+            new PolygonAaveLeveragedBorrowing_DAI_Vault(
                 host,
                 cfa,
                 acceptedToken,
                 ISuperToken(address(sybToken)),
-                controller_,
-                unwrappedAcceptedToken,
-                investmentPercentage_
+                controller_
+                // unwrappedAcceptedToken
             )
         );
+
+        // Set the proxy to use the Super Token logic managed by Superfluid Protocol Governance
+        superTokenFactory.initializeCustomSuperToken(address(sybToken));
 
         // Set up the token and start with 0 tokens in the super vault
         // string(abi.encodePacked("TBD ", ERC20(underlying_).name())),
@@ -61,7 +63,7 @@ contract MasterStreamer {
         sybToken.initialize(
             "streamed yield bearing TBD",
             "sybTBD",
-            0,
+            TOTAL_SUPPLY,
             address(superVault)
         );
     }

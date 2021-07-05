@@ -59,7 +59,7 @@ contract SuperAppPipe is IERC777Recipient, SuperAppBase {
             address(this)
         );
 
-        host_ = host_;
+        host = host_;
         cfa = cfa_;
         acceptedToken = acceptedToken_;
         yBearingToken = yBearingToken_;
