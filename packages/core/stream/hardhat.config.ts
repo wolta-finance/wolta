@@ -26,7 +26,7 @@ const config: HardhatUserConfig = {
         url: process.env.RPC_URL,
         blockNumber: Number(process.env.BLOCK_NUMBER),
       },
-      blockGasLimit: 15450000,
+      gas: 12450000,
     },
   },
 };

@@ -19,7 +19,7 @@ contract MasterStreamer {
     ISuperTokenFactory private superTokenFactory;
     address public superVault;
     address public unwrappedAcceptedToken;
-    uint256 constant TOTAL_SUPPLY = 1000000000000000000000000;
+    uint256 constant TOTAL_SUPPLY = 1000000000000000000000000; // should be 0
 
     constructor(
         ISuperfluid host_,

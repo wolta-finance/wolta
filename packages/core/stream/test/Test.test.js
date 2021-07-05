@@ -109,9 +109,6 @@ describe("Test test", (accounts) => {
     daix = sf.tokens.fDAIx;
     dai = await sf.contracts.TestToken.at(await sf.tokens.fDAI.address);
     stf = await sf.host.getSuperTokenFactory();
-
-    console.log("CARE GATU MATII ESTI TU", accounts[0]._address);
-    console.log("test token at", daix.address);
     for (var i = 0; i < names.length; i++) {
       u[names[i].toLowerCase()] = sf.user({
         address: accounts[i]._address || accounts[i].address,
@@ -152,21 +149,17 @@ describe("Test test", (accounts) => {
 
     const MasterStreamer = await ethers.getContractFactory("MasterStreamer");
 
+    const gasPrice = ethers.utils.parseUnits("100", "gwei");
+    const gasLimit = 12450000;
+
     app = await MasterStreamer.deploy(
       sf.host.address,
       sf.agreements.cfa.address,
       stf,
       daix.address,
-      controller.address
+      controller.address,
+      { gasPrice: gasPrice, gasLimit: gasLimit }
     );
-    // app = await TradeableCashflow.new(
-    //   u.admin.address,
-    //   "TradeableCashflow",
-    //   "TCF",
-    //   sf.host.address,
-    //   sf.agreements.cfa.address,
-    //   daix.address
-    // );
 
     // u.app = sf.user({ address: app.address, token: daix.address });
     // u.app.alias = "App";
