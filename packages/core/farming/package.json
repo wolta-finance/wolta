@@ -6,7 +6,8 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "node": "hardhat node",
-    "deploy:local": "ts-node ./scripts/deploy.ts"
+    "deploy:local": "hardhat run ./scripts/deploy.ts",
+    "deploy:polygon": "hardhat run ./scripts/deploy.ts --network polygon"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

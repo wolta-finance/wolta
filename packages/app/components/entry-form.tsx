@@ -1,6 +1,8 @@
 import { useState, Fragment } from 'react';
+import { useTokenBalance } from '@usedapp/core';
 import { useModals } from './modalprovider';
 import TokenSelect from './token-select';
+import { formatUnits } from '@ethersproject/units'
 import InvestmentSelect from './investment-select';
 import Image from 'next/image'
 import EthTokenList from '../public/blockchains/ethereum/tokenlist.json';
@@ -38,7 +40,8 @@ const EntryForm = ({ vault }) => {
     const [ currentVault, setCurrentVault] = useState(vault);
     const [currentMode, setCurrentMode] = useState(mode.direct);
     const [currentInvestmentType, setCurrentInvestmentType] = useState(investmentType.traditional);
-    console.log(currentVault)
+    const balance = useTokenBalance('0x8f3cf7ad23cd3cadbd9735aff958023239c6a063','0x4444ad20879051b696a1c14ccf6e3b0459466666');
+    console.log(formatUnits(balance, 18))
 
     const handleInvestmentSelect = newInvestmentType => {
         setCurrentInvestmentType(newInvestmentType.name)

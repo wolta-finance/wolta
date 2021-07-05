@@ -26,6 +26,10 @@ const config: HardhatUserConfig = {
         blockNumber: Number(process.env.BLOCK_NUMBER),
       },
     },
+    polygon: {
+      url: process.env.MAINNET_RPC_URL,
+      accounts: [process.env.MAINNET_ACCOUNT_KEY]
+    }
   },
 };
 
