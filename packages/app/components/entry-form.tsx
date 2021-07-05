@@ -41,7 +41,9 @@ const EntryForm = ({ vault }) => {
     const [currentMode, setCurrentMode] = useState(mode.direct);
     const [currentInvestmentType, setCurrentInvestmentType] = useState(investmentType.traditional);
     const balance = useTokenBalance('0x8f3cf7ad23cd3cadbd9735aff958023239c6a063','0x4444ad20879051b696a1c14ccf6e3b0459466666');
-    console.log(formatUnits(balance, 18))
+    if (balance) {
+        console.log(formatUnits(balance, 18))
+    }
 
     const handleInvestmentSelect = newInvestmentType => {
         setCurrentInvestmentType(newInvestmentType.name)
