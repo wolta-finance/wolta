@@ -1,5 +1,5 @@
-import { useState, Fragment } from 'react';
-import { useTokenBalance } from '@usedapp/core';
+import { useState, useEffect, useCallback, Fragment } from 'react';
+import { useTokenBalance, useEthers, useTokenAllowance } from '@usedapp/core';
 import { useModals } from './modalprovider';
 import TokenSelect from './token-select';
 import { formatUnits } from '@ethersproject/units'
@@ -7,7 +7,8 @@ import InvestmentSelect from './investment-select';
 import Image from 'next/image'
 import EthTokenList from '../public/blockchains/ethereum/tokenlist.json';
 
-import { vaultSymbols } from '../constants/vaults';
+import { vaultSymbols, vaultContractsPolygon } from '../constants/vaults';
+import { supportedTokenSymbols, tokenContractsPolygon } from '../constants/tokens';
 const vaults = EthTokenList.tokens.filter(each => vaultSymbols.includes(each.symbol));
 
 const mode = {
@@ -20,39 +21,54 @@ const investmentType = {
     streaming: 'Streaming',
 }
 
-const SillyNotice = () => {
-    const { popModal } = useModals();
-    return(
-        <Fragment>
-            <div className="text-center">
-                <p><strong>Congratulations!</strong> You have entered Wolta Finance super-highway. Powered by Superfluid™️</p>
-            </div>
-            <div className="flex justify-center space-x-4 mb-4">
+// const SillyNotice = () => {
+//     const { popModal } = useModals();
+//     return(
+//         <Fragment>
+//             <div className="text-center">
+//                 <p><strong>Congratulations!</strong> You have entered Wolta Finance super-highway. Powered by Superfluid™️</p>
+//             </div>
+//             <div className="flex justify-center space-x-4 mb-4">
                 
-                <button className="underline" onClick={popModal}>Close</button>
-            </div>
-        </Fragment>
-    )
-}
+//                 <button className="underline" onClick={popModal}>Close</button>
+//             </div>
+//         </Fragment>
+//     )
+// }
 
 const EntryForm = ({ vault }) => {
+    const { account } = useEthers()
     const { pushModal, popModal, animateStream } = useModals();
-    const [ currentVault, setCurrentVault] = useState(vault);
-    const [currentMode, setCurrentMode] = useState(mode.direct);
-    const [currentInvestmentType, setCurrentInvestmentType] = useState(investmentType.traditional);
-    const balance = useTokenBalance('0x8f3cf7ad23cd3cadbd9735aff958023239c6a063','0x4444ad20879051b696a1c14ccf6e3b0459466666');
-    if (balance) {
-        console.log(formatUnits(balance, 18))
-    }
+    const [ currentVault, setCurrentVault ] = useState(vault);
+    const [ currentMode, setCurrentMode ] = useState(mode.direct);
+    const [ walletBalance, setWalletBalance ] = useState(undefined);
+    const [ investmentValue,  setInvestmentValue ] = useState(0);
+    const [ currentInvestmentType, setCurrentInvestmentType ] = useState(investmentType.traditional);
+    const allowance = useTokenAllowance(tokenContractsPolygon[currentVault.symbol], account, vaultContractsPolygon[currentVault.symbol])
+    const balance = useTokenBalance(tokenContractsPolygon[currentVault.symbol], account);
+    useEffect(()=>{
+        if (balance) {
+            setWalletBalance(formatUnits(balance, 18))
+        }
+    }, [balance])
+
+    useEffect(() => {
+        console.log('allowance', allowance, tokenContractsPolygon[currentVault.symbol], account, vaultContractsPolygon[currentVault.symbol])
+    }, [allowance, currentVault])
 
     const handleInvestmentSelect = newInvestmentType => {
         setCurrentInvestmentType(newInvestmentType.name)
         if (newInvestmentType.name === investmentType.streaming) {
             animateStream(true);
-            pushModal(<SillyNotice />, { overlay: true });
+            // pushModal(<SillyNotice />, { overlay: true });
         } else {
             animateStream(false);
         }
+    }
+
+    const handleVaultChange = v => {
+        setCurrentVault(vaults[v])
+        setWalletBalance(undefined);
     }
 
     return (
@@ -62,7 +78,7 @@ const EntryForm = ({ vault }) => {
             <span className="text-gray-700">You are depositing into</span>
                 <TokenSelect 
                 value={vaults.findIndex(each=>each.symbol === currentVault.symbol)}
-                onChange={v=>setCurrentVault(vaults[v])}
+                onChange={handleVaultChange}
                 selectOptions={vaults.map(each => `${each.symbol} Vault`)} 
                 currentlySelectedImage={<Image 
                     src={`/blockchains/ethereum/assets/${currentVault.address}/logo.png`} 
@@ -77,14 +93,17 @@ const EntryForm = ({ vault }) => {
                 <TokenSelect 
                     onChange={(v)=>setCurrentMode(mode[Object.keys(mode)[v]])} 
                     value={Object.values(mode).findIndex(e=>e===currentMode)} 
-                    selectOptions={['DAI (Wallet balance: 0.1)', 'Convert token via ZAP']} />
+                    selectOptions={[`${currentVault.symbol} ${walletBalance ? `(Wallet balance: ${walletBalance})` : ''}`, 'Convert token via ZAP']} />
             </label>
             
             {currentMode === mode.zap
             ? (
                 <label className="block mb-4">
                 <span className="text-gray-700">Token to be converted/zapped</span>
-                    <TokenSelect onChange={(v)=>console.log(v)} selectOptions={['Select token', 'USDC']} />
+                    <TokenSelect 
+                        onChange={(v)=>console.log(v)} 
+                        selectOptions={['Select token', ...supportedTokenSymbols.filter(c=>c !== currentVault.symbol)]} 
+                    />
                 </label>
             )
             : (
@@ -97,8 +116,8 @@ const EntryForm = ({ vault }) => {
                     <label className="block mb-4">
                     <span className="text-gray-700">Amount to invest</span>
                     <div className="flex">
-                        <input type="number" className="mt-1 block" placeholder="" defaultValue={0} />
-                        <button className="ml-2 underline" onClick={()=>true}>MAX</button>
+                        <input type="number" className="mt-1 block" placeholder="" onChange={e=>setInvestmentValue(e.target.value)} value={investmentValue} />
+                        <button className="ml-2 underline" onClick={()=>setInvestmentValue(walletBalance)}>MAX</button>
                     </div>
                     </label>
                 )
@@ -115,7 +134,7 @@ const EntryForm = ({ vault }) => {
             
 
             <div className="flex justify-center space-x-4 mb-4">
-                <button className="p-2 border-2 border-black uppercase text-sm font-bold selector-shading"><span className="bg-white">Approve spend of $TOKEN</span></button>
+                {(allowance && formatUnits(allowance, 18) === '0.0') && <button className="p-2 border-2 border-black uppercase text-sm font-bold selector-shading"><span className="bg-white">Approve spend of {currentVault.symbol}</span></button>}
                 <button className="p-2 border-2 border-black uppercase text-sm font-bold"><span className="bg-white">Deposit</span></button>
             </div>
             <div className="flex justify-center space-x-4 mb-4">
