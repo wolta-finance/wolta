@@ -2,6 +2,7 @@ import { config as dotEnvConfig } from "dotenv";
 dotEnvConfig();
 
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-web3";
 
 // This adds support for TS path mappings
 import "tsconfig-paths/register";
@@ -25,6 +26,7 @@ const config: HardhatUserConfig = {
         url: process.env.RPC_URL,
         blockNumber: Number(process.env.BLOCK_NUMBER),
       },
+      gas: 12450000,
     },
   },
 };
